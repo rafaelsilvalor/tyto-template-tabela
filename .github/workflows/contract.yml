@@ -1,0 +1,44 @@
+name: contract
+# Installs the newest published Tyto contract, past the caret range package.json asks for, and
+# runs the tests against it, so a Tyto release that breaks this plugin turns this red before a
+# person installs it. A red run here is a warning, not a broken main: move the range and the
+# manifest's engine together when the new contract is the one to build against.
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+jobs:
+  newest-contract:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        # Writes the scope and `${NODE_AUTH_TOKEN}` into a user-level .npmrc, which pnpm reads.
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: '@rafaelsilvalor'
+      - run: pnpm install --frozen-lockfile
+      # The template is drawn by the house's parts and the kit, so their newest releases are part
+      # of the contract it builds against, beside the plugin API.
+      - run: >-
+          pnpm add --save-dev
+          '@tyto/plugin-api@npm:@rafaelsilvalor/tyto-plugin-api@latest'
+          '@tyto/template-kit@npm:@rafaelsilvalor/tyto-template-kit@latest'
+          '@tyto/house-style@npm:@rafaelsilvalor/tyto-house-style@latest'
+          '@tyto/core@npm:@rafaelsilvalor/tyto-core@latest'
+      - name: installed contract
+        run: >-
+          node -p "['plugin-api', 'template-kit', 'house-style', 'core']
+          .map((name) => '@tyto/' + name + ' ' + require('./node_modules/@tyto/' + name + '/package.json').version)
+          .join('\n')"
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test

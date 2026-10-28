@@ -22039,7 +22039,7 @@ function richTextOf3(context, name) {
 }
 
 // src/template.ts
-var build = oneImageTable(ROXO_TABLE);
+var build = oneImageTable({ ...ROXO_TABLE, accent: "#5900a7" });
 
 // src/index.ts
 var BUILDS = { tabela: build };

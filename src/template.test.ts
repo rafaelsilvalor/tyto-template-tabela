@@ -321,7 +321,7 @@ describe('the brand', () => {
     for (const cell of header.rects) {
       expect(cell.node.kind === 'rect' && cell.node.fill).toEqual({
         kind: 'solid',
-        color: { r: 0x59, g: 0x00, b: 0xa6, a: 1 },
+        color: { r: 0x59, g: 0x00, b: 0xa7, a: 1 },
       });
     }
     expect(ROXO.accent).toBe('#5900a6');

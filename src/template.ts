@@ -11,4 +11,4 @@ import { ROXO_TABLE, oneImageTable } from '@tyto/house-style';
 
 import type { TemplateBuild } from '@tyto/core';
 
-export const build: TemplateBuild = oneImageTable(ROXO_TABLE);
+export const build: TemplateBuild = oneImageTable({ ...ROXO_TABLE, accent: '#5900a7' });

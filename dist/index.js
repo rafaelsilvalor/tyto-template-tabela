@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.1.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.2.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -19766,7 +19766,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.29.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-QMV7CBZL.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.30.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-SUZ3BHQX.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -20185,6 +20185,73 @@ var diagnosticCodes = {
     fatal: true,
     fatality: "A plugin that did not load contributed no slot to skip."
   },
+  // The plugin files' codes (TYTO-432, ADR 0151). A file is tolerant per key and per entry,
+  // as `project.json` is: what is refused costs itself alone, and the rest of the file loads.
+  // Errors where a person wrote something that cannot stand, warnings where Tyto chose for them.
+  E_PLUGIN_FILE_SYNTAX: {
+    severity: "error",
+    summary: "A plugin file or its lock could not be read or is not YAML or JSON of the shape it needs.",
+    template: "Plugin file '{file}' was not loaded: {problem}.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "Only what that file names is missing; a brief that needs it says so on its own."
+  },
+  W_PLUGIN_FILE_KEY_UNKNOWN: {
+    severity: "warning",
+    summary: "A plugin file has a key Tyto does not know.",
+    template: "Plugin file '{file}': '{path}' is not a key Tyto knows, so it is ignored.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "An ignored key changes nothing that loads."
+  },
+  E_PLUGIN_FILE_ENTRY: {
+    severity: "error",
+    summary: "An entry of a plugin file was refused, and that entry alone does not load.",
+    template: "Plugin file '{file}': '{path}' was refused: {problem}.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "Only that entry is missing; the rest of the file loads."
+  },
+  E_PLUGIN_FILE_DUPLICATE: {
+    severity: "error",
+    summary: "One name is given twice in one folder's plugin files, so that folder supplies it from neither.",
+    template: "'{name}' is named by both '{file}' and '{other}' in one folder, which chose no order between them, so neither supplies it.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "Only that name is missing; a brief that needs it says so on its own."
+  },
+  W_PLUGIN_FILE_OVERRIDDEN: {
+    severity: "warning",
+    summary: "A project's plugin file names what the machine's names too, and the project's wins.",
+    template: "'{name}' is named by the project's '{file}' and the machine's '{other}'; the project's is used.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "Something loads; it is the project entry rather than the machine one."
+  },
+  W_PLUGIN_FILE_REPLACES_INSTALLED: {
+    severity: "warning",
+    summary: "A plugin from the plugin files has the name of one installed with tyto plugin install.",
+    template: "Plugin '{plugin}' comes from plugin file '{file}', so the copy installed with tyto plugin install is not activated.",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "A plugin of that name loads; it is the one the files name."
+  },
+  W_PLUGIN_FILE_FETCH: {
+    severity: "warning",
+    summary: "A source the plugin files name could not be fetched.",
+    template: "Could not fetch '{git}' at '{ref}': {problem}. {outcome}",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "The copy fetched earlier loads when there is one; a brief that needs one that is missing says so on its own."
+  },
+  E_PLUGIN_FILE_SOURCE_REFUSED: {
+    severity: "error",
+    summary: "A commit a plugin file names was fetched and could not be loaded as a plugin.",
+    template: "'{git}' at '{ref}' resolved to commit {commit}, which was refused: {problem}. {outcome}",
+    spec: "docs/adr/0151-plugin-files-install-and-configure-templates.md",
+    fatal: false,
+    fatality: "The commit locked before loads when there is one; otherwise nothing from that source does."
+  },
   E_SCENE_SHAPE: {
     severity: "error",
     summary: "A scene does not match the IR schema.",
@@ -20494,6 +20561,24 @@ var diagnosticCodes = {
     summary: "An artwork's content runs past the room its template has for it in one format.",
     template: "Artwork '{artwork}' does not fit format '{format}': its content runs {overflow}px past the room the template has, and that part is cut.",
     spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
+  // Warnings and not errors: a configuration is tolerant per value, as a plugin file is per
+  // entry (ADR 0151 decision 2). The template draws with its default instead, and says so.
+  W_TEMPLATE_VALUE_UNKNOWN: {
+    severity: "warning",
+    summary: "A configuration sets a value the template does not declare configurable.",
+    template: "Template '{template}' declares no configurable value '{name}'; the setting is ignored.",
+    spec: "docs/adr/0153-a-template-declares-its-configurable-values-in-its-manifest.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
+  W_TEMPLATE_VALUE_INVALID: {
+    severity: "warning",
+    summary: "A configuration sets a declared value to one of the wrong kind or outside its limits.",
+    template: "Value '{name}' of template '{template}' {problem}; the template's default is used.",
+    spec: "docs/adr/0153-a-template-declares-its-configurable-values-in-its-manifest.md",
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
   },
@@ -21344,8 +21429,16 @@ function run(text2, options) {
 function lineBreak() {
   return { kind: "break" };
 }
+function numberValue(context, name, fallback) {
+  const value = context.values?.[name];
+  return typeof value === "number" ? value : fallback;
+}
+function colorValue(context, name, fallback) {
+  const value = context.values?.[name];
+  return typeof value === "string" ? value : fallback;
+}
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.29.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.30.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -21436,7 +21529,7 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.3.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.4.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -21550,7 +21643,7 @@ function trimEnds(field) {
   return trimmed.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.1.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.2.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var NO_BREAK_SPACE = "\xA0";
 function glueParenthesised(text4, before) {
   return text4.replace(/ (\([^()]*\))/gu, (_whole, group4, offset) => {
@@ -21670,34 +21763,64 @@ function oneImageTable(brand) {
     const regionTop = PAGE.top + BRAND_ROW.height;
     const regionBottom = context.size.h - PAGE.bottom - SIGNATURE.height;
     const room = regionBottom - regionTop;
+    const look = lookOf(context);
     const table = readTable(richTextOf3(context, "tabela") ?? []);
     const title = titleLines(richTextOf3(context, "titulo") ?? []);
     const glued = gluedCells(table);
-    const plan = fit(table, glued, title, width, room, context.measure);
+    const plan = fit(table, glued, title, width, room, context.measure, look);
     reportOverflow(context.report, plan.height, room);
     const titleBlock = drawTitle(title, plan, width, brand.accent);
-    const tableBlock = drawTable(table, glued, plan, brand.accent);
-    const tableY = regionTop + titleBlock.height + TITLE.gap;
+    const tableBlock = drawTable(table, glued, plan, brand.accent, look);
+    const tableY = regionTop + titleBlock.height + look.titleGap;
     return frame({
       format: context.format,
       size: context.size,
       idPrefix: context.idPrefix,
-      background: solid(PAPER),
+      background: solid(look.paper),
       children: [
         at(PAGE.side, PAGE.top, drawLogo(context.brand, BRAND_ROW.logo, oneInk(brand.accent))),
         at(PAGE.side, regionTop, titleBlock),
         at(PAGE.side, tableY, tableBlock),
-        at(PAGE.side, regionBottom, drawSignature(context.brand, width))
+        at(PAGE.side, regionBottom, drawSignature(context.brand, width, look))
       ]
     });
   };
 }
-function roleStyle(role) {
+var TABLE_VALUE_DEFAULTS = {
+  "title-gap": TITLE.gap,
+  "title-floor": TITLE.floor,
+  "title-ceiling": TITLE.ceiling,
+  "body-floor": BODY.floor,
+  "body-ceiling": BODY.ceiling,
+  "optical-drop": OPTICAL_DROP,
+  paper: PAPER,
+  ink: INK,
+  zebra: ZEBRA,
+  "on-accent": ON_ACCENT,
+  "signature-ink": SIGNATURE_INK
+};
+function lookOf(context) {
+  const defaults = TABLE_VALUE_DEFAULTS;
+  return {
+    titleGap: numberValue(context, "title-gap", defaults["title-gap"]),
+    titleFloor: numberValue(context, "title-floor", defaults["title-floor"]),
+    titleCeiling: numberValue(context, "title-ceiling", defaults["title-ceiling"]),
+    bodyFloor: numberValue(context, "body-floor", defaults["body-floor"]),
+    bodyCeiling: numberValue(context, "body-ceiling", defaults["body-ceiling"]),
+    opticalDrop: numberValue(context, "optical-drop", defaults["optical-drop"]),
+    paper: colorValue(context, "paper", defaults.paper),
+    ink: colorValue(context, "ink", defaults.ink),
+    zebra: colorValue(context, "zebra", defaults.zebra),
+    onAccent: colorValue(context, "on-accent", defaults["on-accent"]),
+    signatureInk: colorValue(context, "signature-ink", defaults["signature-ink"])
+  };
+}
+function roleStyle(role, look) {
   switch (role) {
     case "cell":
       return {
         weight: BOOK,
-        color: INK,
+        color: look.ink,
         tracking: 0,
         lineHeight: BODY.lineHeight,
         block: BODY.padding.block,
@@ -21707,7 +21830,7 @@ function roleStyle(role) {
     case "header":
       return {
         weight: BOOK,
-        color: ON_ACCENT,
+        color: look.onAccent,
         tracking: HEADER.tracking,
         lineHeight: HEADER.lineHeight,
         block: BODY.padding.block * HEADER.block,
@@ -21717,7 +21840,7 @@ function roleStyle(role) {
     case "band":
       return {
         weight: BOLD,
-        color: ON_ACCENT,
+        color: look.onAccent,
         tracking: BAND.tracking,
         lineHeight: HEADER.lineHeight,
         block: BODY.padding.block * BAND.block,
@@ -21726,8 +21849,8 @@ function roleStyle(role) {
       };
   }
 }
-function cellText2(words, role, size) {
-  const style2 = roleStyle(role);
+function cellText2(words, role, size, look) {
+  const style2 = roleStyle(role, look);
   return {
     runs: [
       run(style2.upper ? words.toLocaleUpperCase("pt-BR") : words, {
@@ -21752,17 +21875,17 @@ function titleLines(titulo) {
     (line) => plain(line).replace(/\s+/gu, " ").trim().toLocaleUpperCase("pt-BR")
   );
 }
-function fit(table, glued, title, width, room, measure) {
+function fit(table, glued, title, width, room, measure, look) {
   const columns = table.header.length;
   const across = width - CELL.gapX * Math.max(0, columns - 1);
-  const demand = columnDemand(table, glued, measure);
-  if (demand === void 0) return unmeasuredPlan(table, title, width);
+  const demand = columnDemand(table, glued, measure, look);
+  if (demand === void 0) return unmeasuredPlan(table, title, width, look);
   const planAt = (size) => {
     const widths = columnWidths(demand, size, across);
     if (widths === void 0) return void 0;
-    const heights = rowHeights(table, glued, widths, size, measure);
-    const titleSize = titleSizeFor(title, size, width, measure);
-    const titleHeight = titleHeightAt(title, titleSize, width, measure);
+    const heights = rowHeights(table, glued, widths, size, measure, look);
+    const titleSize = titleSizeFor(title, size, width, measure, look);
+    const titleHeight = titleHeightAt(title, titleSize, width, measure, look);
     const tableHeight = sum(heights) + CELL.gapY * Math.max(0, heights.length - 1);
     return {
       size,
@@ -21770,12 +21893,12 @@ function fit(table, glued, title, width, room, measure) {
       titleHeight,
       widths,
       heights,
-      height: titleHeight + TITLE.gap + tableHeight,
+      height: titleHeight + look.titleGap + tableHeight,
       unmeasured: false
     };
   };
-  let low = Math.ceil(BODY.floor / BODY.step);
-  let high = Math.floor(BODY.ceiling / BODY.step);
+  let low = Math.ceil(look.bodyFloor / BODY.step);
+  let high = Math.floor(look.bodyCeiling / BODY.step);
   let best;
   while (low <= high) {
     const middle = Math.floor((low + high) / 2);
@@ -21788,17 +21911,17 @@ function fit(table, glued, title, width, room, measure) {
     }
   }
   if (best !== void 0) return best;
-  return planAt(BODY.floor) ?? floorPlan(table, glued, demand, title, width, across, measure);
+  return planAt(look.bodyFloor) ?? floorPlan(table, glued, demand, title, width, across, measure, look);
 }
-function columnDemand(table, glued, measure) {
+function columnDemand(table, glued, measure, look) {
   const min = table.header.map(() => 0);
   const natural = table.header.map(() => 0);
   const take = (words, role, column) => {
-    const whole = widthAt(words, role, measure);
+    const whole = widthAt(words, role, measure, look);
     if (whole === void 0) return false;
     natural[column] = Math.max(natural[column], whole);
     for (const piece of pieces(words)) {
-      const one = widthAt(piece, role, measure);
+      const one = widthAt(piece, role, measure, look);
       if (one === void 0) return false;
       min[column] = Math.max(min[column], one);
     }
@@ -21815,9 +21938,9 @@ function columnDemand(table, glued, measure) {
   }
   return { min, natural };
 }
-function widthAt(words, role, measure) {
+function widthAt(words, role, measure, look) {
   if (words === "") return 0;
-  const measured = measure(text({ ...cellText2(words, role, REFERENCE_SIZE), box: {} }));
+  const measured = measure(text({ ...cellText2(words, role, REFERENCE_SIZE, look), box: {} }));
   return measured?.width;
 }
 function columnWidths(demand, size, room) {
@@ -21837,15 +21960,15 @@ function columnWidths(demand, size, room) {
   const wanted = sum(wants);
   return min.map((value, column) => value + leftover * wants[column] / wanted);
 }
-function rowHeights(table, glued, widths, size, measure) {
+function rowHeights(table, glued, widths, size, measure, look) {
   const whole = sum(widths) + CELL.gapX * Math.max(0, widths.length - 1);
   const rowOf = (cells, role, spans) => {
-    const style2 = roleStyle(role);
+    const style2 = roleStyle(role, look);
     let tallest = style2.lineHeight * size;
     for (const [column, words] of cells.entries()) {
       if (words === "") continue;
       const inner = spans[column] - 2 * style2.inline * size;
-      const measured = measure(text({ ...cellText2(words, role, size), box: { w: inner } }));
+      const measured = measure(text({ ...cellText2(words, role, size, look), box: { w: inner } }));
       tallest = Math.max(tallest, measured?.height ?? style2.lineHeight * size);
     }
     return tallest + 2 * style2.block * size;
@@ -21857,14 +21980,17 @@ function rowHeights(table, glued, widths, size, measure) {
     )
   ];
 }
-function titleSizeFor(title, size, width, measure) {
-  const ceiling = Math.max(TITLE.floor, Math.min(TITLE.ceiling, Math.floor(TITLE.perBody * size)));
-  let low = TITLE.floor;
+function titleSizeFor(title, size, width, measure, look) {
+  const ceiling = Math.max(
+    look.titleFloor,
+    Math.min(look.titleCeiling, Math.floor(TITLE.perBody * size))
+  );
+  let low = look.titleFloor;
   let high = ceiling;
-  let best = TITLE.floor;
+  let best = look.titleFloor;
   while (low <= high) {
     const middle = Math.floor((low + high) / 2);
-    const measured = measureTitle(title, middle, width, measure);
+    const measured = measureTitle(title, middle, width, measure, look);
     if (measured === void 0 || measured.lines <= TITLE.maxLines) {
       best = middle;
       low = middle + 1;
@@ -21874,17 +22000,17 @@ function titleSizeFor(title, size, width, measure) {
   }
   return best;
 }
-function titleHeightAt(title, size, width, measure) {
+function titleHeightAt(title, size, width, measure, look) {
   if (title.length === 0) return 0;
-  const measured = measureTitle(title, size, width, measure);
+  const measured = measureTitle(title, size, width, measure, look);
   return measured?.height ?? TITLE.maxLines * TITLE.lineHeight * size;
 }
-function unmeasuredPlan(table, title, width) {
+function unmeasuredPlan(table, title, width, look) {
   const columns = Math.max(1, table.header.length);
   const size = UNMEASURED.body;
   const column = (width - CELL.gapX * (columns - 1)) / columns;
   const line = (role) => {
-    const style2 = roleStyle(role);
+    const style2 = roleStyle(role, look);
     return style2.lineHeight * size + 2 * style2.block * size;
   };
   const heights = [
@@ -21898,25 +22024,25 @@ function unmeasuredPlan(table, title, width) {
     titleHeight,
     widths: table.header.map(() => column),
     heights,
-    height: titleHeight + TITLE.gap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1),
+    height: titleHeight + look.titleGap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1),
     unmeasured: true
   };
 }
-function floorPlan(table, glued, demand, title, width, room, measure) {
-  const size = BODY.floor;
+function floorPlan(table, glued, demand, title, width, room, measure, look) {
+  const size = look.bodyFloor;
   const total = sum(demand.min);
   const widths = demand.min.map(
     (value) => total === 0 ? room / demand.min.length : room * value / total
   );
-  const heights = rowHeights(table, glued, widths, size, measure);
-  const titleHeight = titleHeightAt(title, TITLE.floor, width, measure);
+  const heights = rowHeights(table, glued, widths, size, measure, look);
+  const titleHeight = titleHeightAt(title, look.titleFloor, width, measure, look);
   return {
     size,
-    title: TITLE.floor,
+    title: look.titleFloor,
     titleHeight,
     widths,
     heights,
-    height: titleHeight + TITLE.gap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1),
+    height: titleHeight + look.titleGap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1),
     unmeasured: false
   };
 }
@@ -21936,8 +22062,8 @@ function titleNode(title, size, width, color2, height) {
     letterSpacing: TITLE.tracking * size
   });
 }
-function measureTitle(title, size, width, measure) {
-  return measure(titleNode(title, size, width - 2 * TITLE.inset, INK));
+function measureTitle(title, size, width, measure, look) {
+  return measure(titleNode(title, size, width - 2 * TITLE.inset, look.ink));
 }
 function drawTitle(title, plan, width, accent) {
   if (title.length === 0) return block(width, 0, group({ name: "title", children: [] }));
@@ -21949,13 +22075,13 @@ function drawTitle(title, plan, width, accent) {
     group({ children: [at(TITLE.inset, 0, block(inner, plan.titleHeight, node2))] })
   );
 }
-function drawTable(table, glued, plan, accent) {
+function drawTable(table, glued, plan, accent, look) {
   const whole = sum(plan.widths) + CELL.gapX * Math.max(0, plan.widths.length - 1);
   const children = [];
   let y = 0;
   let striped = 0;
   const drawRow = (name, cells, role, spans, fill, height2) => {
-    const style2 = roleStyle(role);
+    const style2 = roleStyle(role, look);
     const cellNodes = [];
     let x = 0;
     for (const [column, words] of cells.entries()) {
@@ -21973,10 +22099,10 @@ function drawTable(table, glued, plan, accent) {
       }
       if (words !== "") {
         const padX = style2.inline * plan.size;
-        const trim = 2 * OPTICAL_DROP * plan.size;
+        const trim = 2 * look.opticalDrop * plan.size;
         cellNodes.push(
           text({
-            ...cellText2(words, role, plan.size),
+            ...cellText2(words, role, plan.size, look),
             name: "cell-text",
             box: { w: span - 2 * padX, h: height2 - trim },
             align: "center",
@@ -22002,7 +22128,7 @@ function drawTable(table, glued, plan, accent) {
         glued.rows[index],
         "cell",
         plan.widths,
-        striped % 2 === 0 ? ZEBRA : void 0,
+        striped % 2 === 0 ? look.zebra : void 0,
         height2
       );
       striped += 1;
@@ -22012,7 +22138,7 @@ function drawTable(table, glued, plan, accent) {
   const height = Math.max(0, y - CELL.gapY);
   return block(whole, height, group({ name: "table", children }));
 }
-function drawSignature(kit, width) {
+function drawSignature(kit, width, look) {
   const words = text({
     name: "signature",
     runs: [
@@ -22020,7 +22146,7 @@ function drawSignature(kit, width) {
         font: FACE,
         size: SIGNATURE.size,
         weight: BOOK,
-        color: SIGNATURE_INK
+        color: look.signatureInk
       })
     ],
     box: { w: width, h: SIGNATURE.height },

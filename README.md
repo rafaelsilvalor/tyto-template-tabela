@@ -41,6 +41,15 @@ on the machine crosses only under this permission. Without it the render warns
 `W_PLUGIN_FONT_WITHHELD` and the table falls back to its unmeasured sizes. On a machine without
 CircularXX, Tyto measures and draws its bundled substitute and needs no permission.
 
+## What a configuration may change
+
+`templates/tabela/manifest.yaml` declares the same eleven `values` as Tyto's built-in
+`tabela-roxo` (Tyto ADR 0153): the gap under the title, the title's and the body's size limits,
+the optical drop, and the paper, ink, zebra, on-accent and signature colours. Not the accent,
+which is the brand's. Each default is the constant the table drew with before, so with nothing
+configured it draws the same bytes. A manifest with `values` needs a Tyto whose plugin API is
+0.7 or newer, which is why `engine` is `>=0.7`.
+
 ## Development
 
 `pnpm check` runs Prettier, the type checker, ESLint and the tests; `pnpm build` writes
@@ -67,6 +76,8 @@ The tests, all without Tyto:
   `@tyto/template-kit/testing` (Tyto ADR 0152), against the HTML in `tests/__snapshots__/`.
   Nothing is measured and faces are placeholders, so the snapshot moves when the composition
   does and not when a machine has another font.
+- `tests/values.test.ts`: the declared values — the same names as the built-in, each default
+  pinned to the one the code falls back to, and a colour set in a test found in the HTML.
 - `tests/plugin.test.ts`: the built `dist/index.js`, loaded through
   `@tyto/plugin-api/testing` (Tyto ADR 0150), drawing `tabela` across the isolation protocol.
 

@@ -48,7 +48,8 @@ CircularXX, Tyto measures and draws its bundled substitute and needs no permissi
 the optical drop, and the paper, ink, zebra, on-accent and signature colours. Not the accent,
 which is the brand's. Each default is the constant the table drew with before, so with nothing
 configured it draws the same bytes. A manifest with `values` needs a Tyto whose plugin API is
-0.7 or newer, which is why `engine` is `>=0.7`.
+0.7 or newer. `engine` is `>=0.11`, the plugin API of the release whose export centres a
+tracked line by its ink (Tyto 0.12, TYTO-491), which the snapshots record.
 
 ## Development
 

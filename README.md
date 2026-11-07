@@ -30,6 +30,11 @@ formats: [grid]
 ---
 ```
 
+**The seal.** `selo: ./selo.png` in the frontmatter glues the house's seal, an art 1080 × 140,
+to the foot of the image (TYTO-201, TYTO-480), as every house template with a grid takes it.
+The table is then fitted to the page above the seal, and the signature stands on the seal's
+top; without `selo` the image is the same bytes as before.
+
 ## What it may reach
 
 | Permission        | Why                                                                     |

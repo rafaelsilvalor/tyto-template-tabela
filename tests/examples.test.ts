@@ -37,3 +37,27 @@ describe.each(['tres-colunas', 'quatro-colunas'])('the example %s', (example) =>
     );
   });
 });
+
+describe('an example with the seal (TYTO-480)', () => {
+  it('accepts `selo:` in the frontmatter and draws it into the image', async () => {
+    const brief = read('../templates/tabela/examples/tres-colunas.brief').replace(
+      'formats: [grid]',
+      'formats: [grid]\nselo: ./selo.png',
+    );
+    const result = await compileTemplate({
+      brief,
+      template,
+      formats,
+      assets: {
+        base: '(examples test)',
+        resolve: (reference) =>
+          Promise.resolve({ id: reference, source: 'file', path: reference, hash: 'selo' }),
+      },
+    });
+    if (!result.ok) throw new Error(result.error.map((item) => item.message).join('\n'));
+
+    const [sealed] = result.value.frames;
+    expect(sealed?.html).toContain('data-name="seal"');
+    expect(sealed?.html).not.toBe(read('./__snapshots__/tres-colunas.html'));
+  });
+});

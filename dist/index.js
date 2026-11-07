@@ -4,51 +4,6 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.5.2/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
-var PAPER = "#fbfbfb";
-var INK = "#000000";
-var ZEBRA = "#f2f2f4";
-var ON_ACCENT = "#ffffff";
-var SIGNATURE_INK = "#8c8ca1";
-var PAGE = { top: 64, side: 64, bottom: 56 };
-var BRAND_ROW = { logo: 92, height: 96 };
-var SIGNATURE = { size: 19, tracking: 0.28, height: 60 };
-var TITLE = {
-  /** Line box, as a multiple of the size: tight, as display type is set. */
-  lineHeight: 1.06,
-  tracking: -0.01,
-  /** The most lines the title may take before it is set smaller. */
-  maxLines: 3,
-  /** The smallest the title is set, whatever the table needs. */
-  floor: 40,
-  ceiling: 96,
-  /**
-   * The title is never more than this many times the body size, so a short table does not
-   * sit under a shouting title. 62 over 22: the approved table art.
-   */
-  perBody: 62 / 22,
-  /** Room on each side of the title, inside the page's. */
-  inset: 20,
-  /** Title → table. */
-  gap: 20
-};
-var BODY = {
-  /** The readable floor: below it the table is drawn anyway, and reported (ADR 0058). */
-  floor: 16,
-  ceiling: 34,
-  /** The fit loop's resolution, in px. */
-  step: 0.5,
-  lineHeight: 1.25,
-  /** Padding inside a cell, in em. */
-  padding: { block: 0.8, inline: 0.5 }
-};
-var HEADER = { tracking: 0.05, lineHeight: 1.2, block: 1.06 };
-var BAND = { tracking: 0.04, block: 0.94, inline: 0.6 };
-var CELL = { radius: 4, gapX: 6, gapY: 5 };
-var OPTICAL_DROP = 0.15;
-var UNMEASURED = { body: 22, title: 62 };
-var REFERENCE_SIZE = 100;
-
 // node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/classic/external.js
 var external_exports = {};
 __export(external_exports, {
@@ -1371,9 +1326,9 @@ var Class = class {
   constructor(..._args) {
   }
 };
-function members(proto, table) {
-  for (const key in table) {
-    const desc = Object.getOwnPropertyDescriptor(table, key);
+function members(proto, table2) {
+  for (const key in table2) {
+    const desc = Object.getOwnPropertyDescriptor(table2, key);
     if (desc.get)
       Object.defineProperty(proto, key, { ...desc, enumerable: false });
     else
@@ -1388,10 +1343,10 @@ function hide(inst, key, value) {
   return own(inst, key, value, false);
 }
 // @__NO_SIDE_EFFECTS__
-function derived(computes, table) {
+function derived(computes, table2) {
   for (const key in computes) {
     const compute = computes[key];
-    Object.defineProperty(table, key, {
+    Object.defineProperty(table2, key, {
       configurable: true,
       enumerable: true,
       get() {
@@ -1402,7 +1357,7 @@ function derived(computes, table) {
       }
     });
   }
-  return table;
+  return table2;
 }
 function defineBound(proto, key, fn) {
   Object.defineProperty(proto, key, {
@@ -21755,6 +21710,17 @@ function text(options) {
     ...options.id !== void 0 ? { id: options.id } : {}
   };
 }
+function image(options) {
+  return {
+    ...base(options),
+    kind: "image",
+    asset: options.asset,
+    size: options.size,
+    fit: options.fit ?? "cover",
+    position: options.position ?? { x: 0.5, y: 0.5 },
+    ...options.id !== void 0 ? { id: options.id } : {}
+  };
+}
 function vector(options) {
   return {
     ...base(options),
@@ -21799,6 +21765,51 @@ function frame(options) {
     ...options.background !== void 0 ? { background: options.background } : {}
   };
 }
+
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.5.2/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
+var PAPER = "#fbfbfb";
+var INK = "#000000";
+var ZEBRA = "#f2f2f4";
+var ON_ACCENT = "#ffffff";
+var SIGNATURE_INK = "#8c8ca1";
+var PAGE = { top: 64, side: 64, bottom: 56 };
+var BRAND_ROW = { logo: 92, height: 96 };
+var SIGNATURE = { size: 19, tracking: 0.28, height: 60 };
+var TITLE = {
+  /** Line box, as a multiple of the size: tight, as display type is set. */
+  lineHeight: 1.06,
+  tracking: -0.01,
+  /** The most lines the title may take before it is set smaller. */
+  maxLines: 3,
+  /** The smallest the title is set, whatever the table needs. */
+  floor: 40,
+  ceiling: 96,
+  /**
+   * The title is never more than this many times the body size, so a short table does not
+   * sit under a shouting title. 62 over 22: the approved table art.
+   */
+  perBody: 62 / 22,
+  /** Room on each side of the title, inside the page's. */
+  inset: 20,
+  /** Title → table. */
+  gap: 20
+};
+var BODY = {
+  /** The readable floor: below it the table is drawn anyway, and reported (ADR 0058). */
+  floor: 16,
+  ceiling: 34,
+  /** The fit loop's resolution, in px. */
+  step: 0.5,
+  lineHeight: 1.25,
+  /** Padding inside a cell, in em. */
+  padding: { block: 0.8, inline: 0.5 }
+};
+var HEADER = { tracking: 0.05, lineHeight: 1.2, block: 1.06 };
+var BAND = { tracking: 0.04, block: 0.94, inline: 0.6 };
+var CELL = { radius: 4, gapX: 6, gapY: 5 };
+var OPTICAL_DROP = 0.15;
+var UNMEASURED = { body: 22, title: 62 };
+var REFERENCE_SIZE = 100;
 
 // node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.11.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
@@ -21895,6 +21906,16 @@ function mark(shape, height, fill, name) {
       transform: { scaleX: scale, scaleY: scale }
     })
   );
+}
+function sealed(size, seal) {
+  if (seal === void 0) return { size, seal: [] };
+  const band = { w: size.w, h: seal.height };
+  const art = block(
+    band.w,
+    band.h,
+    image({ name: "seal", asset: seal.asset, size: band, fit: "cover" })
+  );
+  return { size: { w: size.w, h: size.h - seal.height }, seal: [at(0, size.h - seal.height, art)] };
 }
 function reportOverflow(report, bottom, limit) {
   const overflow = bottom - limit;
@@ -22060,6 +22081,13 @@ var style = (size, weight, color2) => ({
 var EXAM_STYLE = style(TYPE.exam, BOOK, ROW_INK);
 var TITLE_STYLE = style(TYPE.title, BOLD, TITLE_INK);
 var TITLE_LINE = Math.round(TYPE.title * TITLE2.lineHeight);
+var SEAL_HEIGHT = 140;
+function sealOf(context) {
+  if (context.format !== "grid") return void 0;
+  if (context.artwork.index !== context.artwork.count - 1) return void 0;
+  const value = context.slots["selo"]?.value;
+  return value?.kind === "image" ? { asset: value.asset, height: SEAL_HEIGHT } : void 0;
+}
 function readTable(text4) {
   const [first, ...rest] = lines(text4);
   if (first === void 0) return { header: [], rows: [] };
@@ -22097,13 +22125,13 @@ function oneImageTable(own2) {
     const regionBottom = context.size.h - PAGE.bottom - SIGNATURE.height;
     const room = regionBottom - regionTop;
     const look = lookOf(context);
-    const table = readTable(richTextOf3(context, "tabela") ?? []);
+    const table2 = readTable(richTextOf3(context, "tabela") ?? []);
     const title = titleLines(richTextOf3(context, "titulo") ?? []);
-    const glued = gluedCells(table);
-    const plan = fit(table, glued, title, width, room, context.measure, look);
+    const glued = gluedCells(table2);
+    const plan = fit(table2, glued, title, width, room, context.measure, look);
     reportOverflow(context.report, plan.height, room);
     const titleBlock = drawTitle(title, plan, width, brand.accent);
-    const tableBlock = drawTable(table, glued, plan, brand.accent, look);
+    const tableBlock = drawTable(table2, glued, plan, brand.accent, look);
     const tableY = regionTop + titleBlock.height + look.titleGap;
     return frame({
       format: context.format,
@@ -22197,10 +22225,10 @@ function cellText2(words, role, size, look) {
     letterSpacing: style2.tracking * size
   };
 }
-function gluedCells(table) {
+function gluedCells(table2) {
   return {
-    header: table.header.map(glue),
-    rows: table.rows.map((row) => row.kind === "cells" ? row.cells.map(glue) : [glue(row.text)])
+    header: table2.header.map(glue),
+    rows: table2.rows.map((row) => row.kind === "cells" ? row.cells.map(glue) : [glue(row.text)])
   };
 }
 function titleLines(titulo) {
@@ -22208,15 +22236,15 @@ function titleLines(titulo) {
     (line) => plain(line).replace(/\s+/gu, " ").trim().toLocaleUpperCase("pt-BR")
   );
 }
-function fit(table, glued, title, width, room, measure, look) {
-  const columns = table.header.length;
+function fit(table2, glued, title, width, room, measure, look) {
+  const columns = table2.header.length;
   const across = width - CELL.gapX * Math.max(0, columns - 1);
-  const demand = columnDemand(table, glued, measure, look);
-  if (demand === void 0) return unmeasuredPlan(table, title, width, look);
+  const demand = columnDemand(table2, glued, measure, look);
+  if (demand === void 0) return unmeasuredPlan(table2, title, width, look);
   const planAt = (size) => {
     const widths = columnWidths(demand, size, across);
     if (widths === void 0) return void 0;
-    const heights = rowHeights(table, glued, widths, size, measure, look);
+    const heights = rowHeights(table2, glued, widths, size, measure, look);
     const titleSize = titleSizeFor(title, size, width, measure, look);
     const titleHeight = titleHeightAt(title, titleSize, width, measure, look);
     const tableHeight = sum(heights) + CELL.gapY * Math.max(0, heights.length - 1);
@@ -22244,11 +22272,11 @@ function fit(table, glued, title, width, room, measure, look) {
     }
   }
   if (best !== void 0) return best;
-  return planAt(look.bodyFloor) ?? floorPlan(table, glued, demand, title, width, across, measure, look);
+  return planAt(look.bodyFloor) ?? floorPlan(table2, glued, demand, title, width, across, measure, look);
 }
-function columnDemand(table, glued, measure, look) {
-  const min = table.header.map(() => 0);
-  const natural = table.header.map(() => 0);
+function columnDemand(table2, glued, measure, look) {
+  const min = table2.header.map(() => 0);
+  const natural = table2.header.map(() => 0);
   const take = (words, role, column) => {
     const whole = widthAt(words, role, measure, look);
     if (whole === void 0) return false;
@@ -22263,7 +22291,7 @@ function columnDemand(table, glued, measure, look) {
   for (const [column, words] of glued.header.entries()) {
     if (!take(words, "header", column)) return void 0;
   }
-  for (const [index, row] of table.rows.entries()) {
+  for (const [index, row] of table2.rows.entries()) {
     if (row.kind !== "cells") continue;
     for (const [column, words] of glued.rows[index].entries()) {
       if (!take(words, "cell", column)) return void 0;
@@ -22293,7 +22321,7 @@ function columnWidths(demand, size, room) {
   const wanted = sum(wants);
   return min.map((value, column) => value + leftover * wants[column] / wanted);
 }
-function rowHeights(table, glued, widths, size, measure, look) {
+function rowHeights(table2, glued, widths, size, measure, look) {
   const whole = sum(widths) + CELL.gapX * Math.max(0, widths.length - 1);
   const rowOf = (cells, role, spans) => {
     const style2 = roleStyle(role, look);
@@ -22308,7 +22336,7 @@ function rowHeights(table, glued, widths, size, measure, look) {
   };
   return [
     rowOf(glued.header, "header", widths),
-    ...table.rows.map(
+    ...table2.rows.map(
       (row, index) => row.kind === "cells" ? rowOf(glued.rows[index], "cell", widths) : rowOf(glued.rows[index], "band", [whole])
     )
   ];
@@ -22338,8 +22366,8 @@ function titleHeightAt(title, size, width, measure, look) {
   const measured = measureTitle(title, size, width, measure, look);
   return measured?.height ?? TITLE.maxLines * TITLE.lineHeight * size;
 }
-function unmeasuredPlan(table, title, width, look) {
-  const columns = Math.max(1, table.header.length);
+function unmeasuredPlan(table2, title, width, look) {
+  const columns = Math.max(1, table2.header.length);
   const size = UNMEASURED.body;
   const column = (width - CELL.gapX * (columns - 1)) / columns;
   const line = (role) => {
@@ -22348,26 +22376,26 @@ function unmeasuredPlan(table, title, width, look) {
   };
   const heights = [
     line("header"),
-    ...table.rows.map((row) => line(row.kind === "cells" ? "cell" : "band"))
+    ...table2.rows.map((row) => line(row.kind === "cells" ? "cell" : "band"))
   ];
   const titleHeight = title.length === 0 ? 0 : title.length * TITLE.lineHeight * UNMEASURED.title;
   return {
     size,
     title: UNMEASURED.title,
     titleHeight,
-    widths: table.header.map(() => column),
+    widths: table2.header.map(() => column),
     heights,
     height: titleHeight + look.titleGap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1),
     unmeasured: true
   };
 }
-function floorPlan(table, glued, demand, title, width, room, measure, look) {
+function floorPlan(table2, glued, demand, title, width, room, measure, look) {
   const size = look.bodyFloor;
   const total = sum(demand.min);
   const widths = demand.min.map(
     (value) => total === 0 ? room / demand.min.length : room * value / total
   );
-  const heights = rowHeights(table, glued, widths, size, measure, look);
+  const heights = rowHeights(table2, glued, widths, size, measure, look);
   const titleHeight = titleHeightAt(title, look.titleFloor, width, measure, look);
   return {
     size,
@@ -22408,7 +22436,7 @@ function drawTitle(title, plan, width, accent) {
     group({ children: [at(TITLE.inset, 0, block(inner, plan.titleHeight, node2))] })
   );
 }
-function drawTable(table, glued, plan, accent, look) {
+function drawTable(table2, glued, plan, accent, look) {
   const whole = sum(plan.widths) + CELL.gapX * Math.max(0, plan.widths.length - 1);
   const children = [];
   let y = 0;
@@ -22451,7 +22479,7 @@ function drawTable(table, glued, plan, accent, look) {
   };
   drawRow("header-row", glued.header, "header", plan.widths, accent, plan.heights[0]);
   y += plan.heights[0] + CELL.gapY;
-  for (const [index, row] of table.rows.entries()) {
+  for (const [index, row] of table2.rows.entries()) {
     const height2 = plan.heights[index + 1];
     if (row.kind === "band") {
       drawRow("band-row", glued.rows[index], "band", [whole], accent, height2);
@@ -22498,7 +22526,21 @@ function richTextOf3(context, name) {
 }
 
 // src/template.ts
-var build = oneImageTable(ROXO_TABLE);
+var table = oneImageTable(ROXO_TABLE);
+var build = (context) => {
+  const seal = sealOf(context);
+  if (seal === void 0) return table(context);
+  const page = sealed(context.size, seal);
+  const above = table({ ...context, size: page.size });
+  return frame({
+    format: context.format,
+    size: context.size,
+    idPrefix: context.idPrefix,
+    ...above.background === void 0 ? {} : { background: above.background },
+    // The table's nodes keep their ids; the seal takes the next one.
+    children: [...above.children, ...page.seal]
+  });
+};
 
 // src/index.ts
 var BUILDS = { tabela: build };

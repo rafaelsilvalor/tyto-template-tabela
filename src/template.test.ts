@@ -2,10 +2,11 @@ import { measureNothing, noBrandKit, noFiles } from '@tyto/core';
 import { describe, expect, it } from 'vitest';
 
 import { build } from './template.js';
-import { NO_BREAK_SPACE, ROXO } from '@tyto/house-style';
+import { NO_BREAK_SPACE, ROXO, ROXO_TABLE, SEAL_HEIGHT, oneImageTable } from '@tyto/house-style';
 import { BODY, OPTICAL_DROP, SIGNATURE, PAGE, TITLE } from '@tyto/house-style/table-tokens';
 
 import type {
+  AssetRef,
   Frame,
   Inline,
   RichText,
@@ -137,9 +138,23 @@ interface Built {
 function render(
   brief: { titulo: string; tabela: string },
   measure: TemplateContext['measure'] = proportional,
+  selo = false,
 ): Built {
   const reports: TemplateReport[] = [];
-  const frame = build({
+  const frame = build(contextOf(brief, measure, reports, selo));
+  return { frame, reports };
+}
+
+/** The seal a brief's `selo:` resolves to; no file is read. */
+const SELO: AssetRef = { id: 'selo', source: 'file', path: 'selo.png', hash: 'selo' };
+
+function contextOf(
+  brief: { titulo: string; tabela: string },
+  measure: TemplateContext['measure'],
+  reports: TemplateReport[],
+  selo: boolean,
+): TemplateContext {
+  return {
     format: 'grid',
     size: { w: 1080, h: 1350 },
     idPrefix: 'artwork-0-grid',
@@ -155,14 +170,16 @@ function render(
         value: { kind: 'rich-text', text: rich(brief.tabela) },
         adjustments: [],
       },
+      ...(selo
+        ? { selo: { name: 'selo', value: { kind: 'image', asset: SELO }, adjustments: [] } }
+        : {}),
     },
     adjustments: {},
     measure,
     report: (report) => reports.push(report),
     files: noFiles,
     brand: noBrandKit,
-  });
-  return { frame, reports };
+  };
 }
 
 /* ------------------------------------------------------------------ reading a scene -- */
@@ -401,3 +418,60 @@ describe('with nothing to measure', () => {
     for (const item of texts) expect((item.node as TextNode).overflow).toBe('shrink');
   });
 });
+
+/* ------------------------------------------------------------------------- the seal -- */
+
+/**
+ * The house's seal (TYTO-201, TYTO-480): the brief's `selo`, 1080 × 140, glued to the image's
+ * foot, with the table fitted to the page above it so the signature clears it (TYTO-469).
+ */
+describe('the seal', () => {
+  const sealTop = 1350 - SEAL_HEIGHT;
+
+  it('draws a brief without a seal exactly as the house composition does', () => {
+    const reports: TemplateReport[] = [];
+    const context = contextOf(THREE_COLUMNS, proportional, reports, false);
+
+    expect(build(context)).toEqual(oneImageTable(ROXO_TABLE)(context));
+  });
+
+  it('glues the seal, the frame wide and 140 tall, to the foot, painted last', () => {
+    const { frame } = render(THREE_COLUMNS, proportional, true);
+    const seal = frame.children.at(-1);
+
+    expect(frame.size).toEqual({ w: 1080, h: 1350 });
+    expect(seal?.name).toBe('seal');
+    expect(seal?.transform).toMatchObject({ x: 0, y: sealTop });
+    expect(seal !== undefined && 'size' in seal ? seal.size : undefined).toEqual({
+      w: 1080,
+      h: SEAL_HEIGHT,
+    });
+    expect(new Set(placed(frame).map((item) => item.node.id)).size).toBe(placed(frame).length);
+  });
+
+  it('stands the signature on the seal and ends the table above it', () => {
+    const { frame, reports } = render(THREE_COLUMNS, proportional, true);
+    const signOff = placed(frame).find((item) => item.node.name === 'sign-off')!;
+    const table = placed(frame).find((item) => item.node.name === 'table')!;
+
+    expect(reports).toEqual([]);
+    expect(signOff.y + SIGNATURE.height).toBe(sealTop - PAGE.bottom);
+    expect(table.y + heightOf(table.node)).toBeGreaterThan(table.y);
+    expect(table.y + heightOf(table.node)).toBeLessThanOrEqual(signOff.y);
+  });
+
+  it('draws everything above the seal as the house draws a page 140 shorter', () => {
+    const reports: TemplateReport[] = [];
+    const context = contextOf(THREE_COLUMNS, proportional, reports, true);
+    const { frame } = render(THREE_COLUMNS, proportional, true);
+    const shorter = oneImageTable(ROXO_TABLE)({ ...context, size: { w: 1080, h: sealTop } });
+
+    expect(frame.children.slice(0, -1)).toEqual(shorter.children);
+  });
+});
+
+/** A group's height, read back from its lowest child's foot. */
+function heightOf(node: SceneNode): number {
+  if (node.kind !== 'group') return 'size' in node ? node.size.h : (node.box.h ?? 0);
+  return Math.max(...node.children.map((child) => child.transform.y + heightOf(child)));
+}

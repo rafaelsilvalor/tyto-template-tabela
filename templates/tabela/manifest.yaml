@@ -1,5 +1,5 @@
 name: tabela
-version: 1.0.0
+version: 1.1.0
 brand: roxo
 description: The table in one image, in roxo's accent by default — a title over the whole table, sized by measuring so every row fits one 1080×1350 post.
 # Measured in the plugin's own process (Tyto ADR 0048), so every face the table sets is declared:
@@ -22,6 +22,10 @@ slots:
   # row; a line with no `|` is a band across the whole table. Column widths, line breaks and
   # sizes are decided by measuring, and a value like `R$ 33.820,39` is never split.
   tabela: { type: rich-text, required: true }
+  # The seal art, 1080 × 140, glued to the foot of the image (TYTO-201, TYTO-480). Optional;
+  # with it the table is fitted to the page above, so nothing is drawn under the seal. In the
+  # frontmatter: `selo: ./selo.png`.
+  selo: { type: image }
 # What a configuration may change (TYTO-458, Tyto ADR 0153), the same eleven values the built-in
 # `tabela-roxo` declares. Each default is the token `@tyto/house-style/table-tokens` held before,
 # so with nothing configured the table draws the same bytes; `tests/values.test.ts` pins them

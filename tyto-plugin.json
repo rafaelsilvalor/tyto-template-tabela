@@ -1,7 +1,7 @@
 {
   "name": "tabela",
   "version": "1.2.0",
-  "engine": ">=0.14",
+  "engine": ">=0.21",
   "contributes": ["template-pack"],
   "permissions": ["font:CircularXX"]
 }

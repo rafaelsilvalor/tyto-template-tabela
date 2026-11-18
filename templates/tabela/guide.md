@@ -6,11 +6,11 @@ between the columns. There is no slide and no call to action: one image, two slo
 
 ## Slots
 
-| Slot     | Where       | Rule                                                                                                                                                                                                    |
-| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `titulo` | directive   | Required, at most 120 characters. The title of the piece, word for word. The template sets it in capitals and picks its size (up to three lines). Write it on one line; a line break you write is kept. |
-| `tabela` | directive   | Required. The whole table, one line per row.                                                                                                                                                            |
-| `selo`   | frontmatter | Optional image, 1080×140: `selo: ./selo.png`. Glued to the foot of the image; the table fits the page above it. Only when the person has the file.                                                      |
+| Slot     | Where       | Rule                                                                                                                                                                                                                         |
+| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `titulo` | directive   | Required, at most 120 characters. The title of the piece, word for word. The template sets it in capitals and picks its size (up to three lines). Write it on one line; a title broken into lines keeps exactly those lines. |
+| `tabela` | directive   | Required. The whole table, one line per row.                                                                                                                                                                                 |
+| `selo`   | frontmatter | Optional image, 1080×140: `selo: ./selo.png`. Glued to the foot of the image; the table fits the page above it. Only when the person has the file.                                                                           |
 
 Format: `formats: [grid]`. There is no other.
 
@@ -25,11 +25,15 @@ Inside `::tabela`:
 - **A line with no `|` is a band** across the full width, a subtitle inside the table. Use one
   only when the copy has such a line. A highlighted line above the table is the title, not a
   band.
+- **A line with no `|` that starts with `*` is a note**, set small under the table: the
+  footnote a value's `*` points to. Keep the `*` on the value (`R$ 4.143,06*`) and at the start
+  of the note. Any other `*` is drawn as an asterisk.
 - **Cells are literal**, only trimmed: `-` stays `-`, `CR` stays `CR`, `5 mil` stays `5 mil`.
   Do not abbreviate, translate or correct values.
-- **Never break a line inside a cell** and never write `\n`. The template chooses where to
-  break and never splits a value such as `R$ 3.820,39`; a range `R$ X a R$ Y` breaks between
-  the two values by itself.
+- **Do not break a line inside a cell** unless the copy does, and never write `\n`. The
+  template chooses where to break and never splits a value such as `R$ 3.820,39`; a range
+  `R$ X a R$ Y` breaks between the two values by itself. When the copy breaks a cell on
+  purpose, write `\` where it breaks: `Comissão formada —\ edital em preparo`.
 - A cell never holds `|`. If the copy has one, replace it with `/` and say so.
 - An empty cell stays empty between the separators (`Órgão Y |  | -`); do not invent content.
 

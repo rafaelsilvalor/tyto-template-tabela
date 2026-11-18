@@ -1,0 +1,20 @@
+---
+template: tabela
+formats: [grid]
+---
+// A note under the table and a typed break inside a cell, in invented copy (TYTO-778).
+// A line with no `|` that starts with `*` is the note; the `\` after "Gama" breaks that cell.
+
+::titulo
+  6 seleções previstas
+  para o próximo semestre!
+
+::tabela
+  Seleção | Situação | Vagas | Salário
+  Órgão Alfa | Banca definida — Banca Beta | 40 + CR | R$ 4.200,00
+  Instituto Gama | Comissão formada —\ edital em preparo | 120 | R$ 3.150,00 a R$ 6.800,00*
+  Agência Delta | Edital publicado | 75 | R$ 5.500,00
+  Fundação Épsilon | Em estudos | - | R$ 2.900,00
+  Conselho Zeta | Banca definida — Banca Eta | 18 | R$ 9.400,00
+  Autarquia Teta | Autorizado | 300 (100 imediatas + 200 CR) | R$ 3.700,00
+  *Instituto Gama: valores do último edital. CR = cadastro de reserva.

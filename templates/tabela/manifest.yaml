@@ -14,13 +14,15 @@ fonts:
 # The grid only: the piece is a feed post that people zoom into (the two approved table arts).
 formats: [grid]
 slots:
-  # The words over the table, set in capitals. A line break in the brief is a line break on
-  # the slide; otherwise the title wraps on its own, in at most three lines.
+  # The words over the table, set in capitals. A title the brief breaks into lines keeps
+  # exactly those lines; otherwise the title wraps on its own, in at most three lines.
   titulo: { type: rich-text, required: true, max: 120 }
   # The table, as the table requests write it. The first line is the header and its `|` count
   # fixes the columns: `Concurso | Banca | Vagas | Salário`. Every later line with a `|` is a
-  # row; a line with no `|` is a band across the whole table. Column widths, line breaks and
-  # sizes are decided by measuring, and a value like `R$ 33.820,39` is never split.
+  # row; a line with no `|` is a band across the whole table, unless it starts with `*`: then
+  # it is a note, set small under the table. A `\` inside a row breaks the line in that cell.
+  # Column widths, every other line break and the sizes are decided by measuring, and a value
+  # like `R$ 33.820,39` is never split.
   tabela: { type: rich-text, required: true }
   # The seal art, 1080 × 140, glued to the foot of the image (TYTO-201, TYTO-480). Optional;
   # with it the table is fitted to the page above, so nothing is drawn under the seal. In the

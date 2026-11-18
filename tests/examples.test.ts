@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { build } from '../src/template.js';
 
 /**
- * Both example briefs, compiled the way Tyto compiles them (Tyto ADR 0152), against the HTML
+ * Every example brief, compiled the way Tyto compiles them (Tyto ADR 0152), against the HTML
  * the template produced last time it was reviewed.
  *
  * Nothing is measured and every face is a placeholder, so the snapshot moves when the
@@ -22,7 +22,7 @@ if (!manifest.ok) throw new Error(manifest.error.map((item) => item.message).joi
 const template = defineTemplate(manifest.value, build);
 const formats = formatCatalogue({ grid: { w: 1080, h: 1350, kind: 'grid' } });
 
-describe.each(['tres-colunas', 'quatro-colunas'])('the example %s', (example) => {
+describe.each(['tres-colunas', 'quatro-colunas', 'nota-e-quebra'])('the example %s', (example) => {
   it('compiles to one grid frame, the HTML the template drew last time', async () => {
     const result = await compileTemplate({
       brief: read(`../templates/tabela/examples/${example}.brief`),

@@ -78,7 +78,7 @@ The tests, all without Tyto:
 
 - `src/template.test.ts`: the table's rules on the scene — every cell's words inside its cell,
   no value split across lines, the header in roxo's accent, the floor for a table too long.
-- `tests/examples.test.ts`: both example briefs compiled as Tyto compiles them, through
+- `tests/examples.test.ts`: every example brief compiled as Tyto compiles them, through
   `@tyto/template-kit/testing` (Tyto ADR 0152), against the HTML in `tests/__snapshots__/`.
   Nothing is measured and faces are placeholders, so the snapshot moves when the composition
   does and not when a machine has another font.

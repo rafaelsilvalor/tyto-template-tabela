@@ -19721,7 +19721,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.51.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-FARCFIZY.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-IT6P3KDS.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -19840,6 +19840,22 @@ var diagnosticCodes = {
     spec: "docs/adr/0117-a-plugin-source-is-fetched-once-and-read-from-a-cache.md",
     fatal: false,
     fatality: "One image the brief named, exactly as a missing file is: the slot stays unset and the rest of the brief renders."
+  },
+  E_ASSET_DECODER_MISSING: {
+    severity: "error",
+    summary: "The brief names a file of a kind no picture is drawn from, and no installed plugin decodes it.",
+    template: "Asset '{path}' is a '{extension}' file, which Tyto cannot draw by itself; install a plugin that decodes '{extension}' files.",
+    spec: "docs/adr/0223-a-plugin-decodes-a-file-kind-into-an-image-through-a-one-call-token.md",
+    fatal: false,
+    fatality: "One image the brief named, exactly as a missing file is: the slot stays unset and the rest of the brief renders."
+  },
+  E_ASSET_DECODE_FAILED: {
+    severity: "error",
+    summary: "The plugin that decodes a file kind could not turn the file the brief named into a picture.",
+    template: "Asset '{path}' could not be decoded by plugin '{plugin}': {problem}.",
+    spec: "docs/adr/0223-a-plugin-decodes-a-file-kind-into-an-image-through-a-one-call-token.md",
+    fatal: false,
+    fatality: "One image the brief named, never drawn blank: the slot stays unset as for a missing file and the rest of the brief renders."
   },
   E_UNSUPPORTED_CSS: {
     severity: "error",
@@ -20511,6 +20527,22 @@ var diagnosticCodes = {
     fatal: true,
     fatality: "The IR is malformed, so the exporter has nothing it can draw."
   },
+  E_SCENE_GUIDE_NODE_NOT_FOUND: {
+    severity: "error",
+    summary: "A guide's layer names a node that is not one of its frame's top-level children.",
+    template: "Layer '{layer}' of the guide for '{frame}' names node '{id}', which is not one of the frame's top-level children.",
+    spec: "docs/adr/0220-a-slot-may-declare-art-painted-outside-tyto.md",
+    fatal: true,
+    fatality: "The IR is malformed, so the exporter has nothing it can draw."
+  },
+  E_SCENE_GUIDE_LAYERING: {
+    severity: "error",
+    summary: "A frame's node is not in exactly one of its guide's layers.",
+    template: "Node '{id}' of the guide for '{frame}' is in {count} layers; every top-level node is in exactly one.",
+    spec: "docs/adr/0220-a-slot-may-declare-art-painted-outside-tyto.md",
+    fatal: true,
+    fatality: "A node in no layer would vanish from the layered file and one in two would be painted twice, so the IR is malformed."
+  },
   E_SCENE_MASK_DESCENDANT: {
     severity: "error",
     summary: "A mask references a descendant of the node it masks.",
@@ -20603,6 +20635,30 @@ var diagnosticCodes = {
     spec: "docs/template-authoring.md",
     fatal: true,
     fatality: "A frame with no size cannot be drawn, and `compile` refuses before it builds anything \u2014 so the formats that are defined do not render either, which is what would have to change first."
+  },
+  E_EXTERNAL_ART_ASPECT: {
+    severity: "error",
+    summary: "A slot's full external art does not keep the proportion of a format it covers (ADR 0220).",
+    template: "Slot '{slot}' of template '{template}' declares full art of {width}\xD7{height} for format '{format}', which is {formatWidth}\xD7{formatHeight}: full art keeps the format's proportion, so its height there is {expected}.",
+    spec: "docs/adr/0220-a-slot-may-declare-art-painted-outside-tyto.md",
+    fatal: true,
+    fatality: "The declaration is the size somebody paints to, and art painted to the wrong proportion is cropped or stretched on every render; `compile` refuses before it builds anything, as it does for a format with no size."
+  },
+  E_GUIDE_NO_EXTERNAL_ART: {
+    severity: "error",
+    summary: "A guide was asked for a brief whose template declares no art painted outside Tyto (ADR 0221).",
+    template: "Template '{template}' declares no slot with external art, so there is no guide to write: a guide is for a slot whose manifest declares 'external'.",
+    spec: "docs/adr/0221-a-guides-layers-are-rasterised-into-the-scene-and-an-exporter-may-answer-bytes.md",
+    fatal: true,
+    fatality: "A guide with no art is the artwork cut into layers with nowhere to paint, which looks like a guide and guides nothing; the run writes no file."
+  },
+  E_GUIDE_NEWER_THAN_BRIEF: {
+    severity: "error",
+    summary: "A guide was not written over because it changed after the brief and may hold paint (ADR 0222).",
+    template: "The guide '{guide}' was changed after the brief, and may hold the art painted in it: move it away, or pass --force to write it again.",
+    spec: "docs/adr/0222-external-art-has-a-file-per-format-beside-the-cited-one.md",
+    fatal: true,
+    fatality: "Writing over a guide somebody painted in loses their work with no way back, so the run writes no guide at all and says which file stopped it."
   },
   E_MANIFEST_SYNTAX: {
     severity: "error",
@@ -20832,6 +20888,14 @@ var diagnosticCodes = {
     spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
+  },
+  W_EXTERNAL_ART_MISSING: {
+    severity: "warning",
+    summary: "A slot whose art is painted outside Tyto has no file yet, and an outlined box stands in for it (ADR 0220).",
+    template: "Slot '{slot}' of template '{template}' has no art yet ({reason}); an outlined box is drawn where it goes.",
+    spec: "docs/adr/0220-a-slot-may-declare-art-painted-outside-tyto.md",
+    fatal: false,
+    fatality: "The art arrives later by design, and the box keeps its place, size and stacking in every format; a warning never replaces a value (ADR 0013)."
   },
   // Warnings and not errors: a configuration is tolerant per value, as a plugin file is per
   // entry (ADR 0151 decision 2). The template draws with its default instead, and says so.
@@ -21487,6 +21551,16 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "Nothing of that plan is written, and no recipe state is committed."
   },
+  // ADR 0219: one Apply of every plan of an `apply together` recipe, refused before any write or
+  // stopped at the first cell that does not go through.
+  E_RECIPE_APPLY_TOGETHER: {
+    severity: "error",
+    summary: "'apply together' did not apply every plan: it was refused before any write, or it stopped at a cell whose Apply did not go through.",
+    template: "'apply together' {problem}.",
+    spec: "docs/adr/0219-apply-together-applies-a-runs-plans-in-order-against-the-renames-above.md",
+    fatal: false,
+    fatality: "The plans below the cell it names are not applied and wait for the next run; what the cells above it applied stays applied."
+  },
   // `to-brief` checks its rows against the template and the workspace before it plans, so a
   // brief that could not compile, or a file outside the workspace, is never shown (ADR 0172).
   E_RECIPE_BRIEF: {
@@ -21507,13 +21581,33 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "That cell has no plan and the cells after it do not run; earlier cells keep theirs. Nothing is written."
   },
+  // `rename-exports` checks its arguments and the workspace before it plans; a delivery it cannot
+  // rename is refused in the cell's note instead, and the others still plan (ADR 0218).
+  E_RECIPE_RENAME_EXPORTS: {
+    severity: "error",
+    summary: "'rename-exports' cannot plan the names of the deliveries' exports: a missing argument, a host that renames no files, or a folder it may not write.",
+    template: "'rename-exports' {problem}.",
+    spec: "docs/adr/0218-a-deliverys-exports-are-renamed-by-its-stem-as-a-plan.md",
+    fatal: false,
+    fatality: "That cell has no plan and the cells after it do not run; earlier cells keep theirs. Nothing is renamed."
+  },
   // `deliveries` reads the records back as rows only inside a trusted workspace; a record it
   // cannot read is a warning, and the other folders still read (ADR 0211).
   E_RECIPE_DELIVERIES: {
     severity: "error",
-    summary: "'deliveries' cannot read the delivery records: it was given an argument, the host reads none, or the recipe is in no trusted workspace.",
+    summary: "'deliveries' cannot read the delivery records: the host reads none, the recipe is in no trusted workspace, or fields= lists a name a declared field cannot have.",
     template: "'deliveries' {problem}.",
     spec: "docs/adr/0211-the-delivery-folder-is-the-source-and-inbound-fields-name-a-winner.md",
+    fatal: false,
+    fatality: "That cell has no table and the cells after it do not run; earlier cells keep theirs. Nothing is written."
+  },
+  // `with-deliveries` reads the same records beside rows already there, through the same checks,
+  // and refuses to shadow a column the table has (TYTO-779, ADR 0213's note of 2026-11-18).
+  E_RECIPE_WITH_DELIVERIES: {
+    severity: "error",
+    summary: "'with-deliveries' cannot bring the delivery records: the host reads none, the recipe is in no trusted workspace, fields= lists a name a declared field cannot have, or the table already has a column it would add.",
+    template: "'with-deliveries' {problem}.",
+    spec: "docs/adr/0213-a-delivery-record-keeps-the-fields-a-recipe-declares.md",
     fatal: false,
     fatality: "That cell has no table and the cells after it do not run; earlier cells keep theirs. Nothing is written."
   },
@@ -21779,8 +21873,8 @@ var diagnosticCodes = {
   // TYTO-771: one unreadable record leaves its delivery out of the table, never the others.
   W_RECIPE_DELIVERY_RECORD: {
     severity: "warning",
-    summary: "'deliveries' left a delivery out of its table: its record is not one, its folder could not be read, or another folder has its key.",
-    template: "'deliveries' left out {folder}: {problem}.",
+    summary: "'deliveries' or 'with-deliveries' left a delivery out: its record is not one, its folder could not be read, or another folder has its key or its name.",
+    template: "'{verb}' left out {folder}: {problem}.",
     spec: "docs/adr/0211-the-delivery-folder-is-the-source-and-inbound-fields-name-a-winner.md",
     fatal: false,
     fatality: "The other deliveries are still read; nothing is written."
@@ -21799,8 +21893,8 @@ var diagnosticCodes = {
   // `fields`; it still reads, and the warning says why its declared columns are empty.
   W_RECIPE_DELIVERY_FIELDS_UNREAD: {
     severity: "warning",
-    summary: "'deliveries' read a record whose 'fields' is not a map of text, and gave it no declared fields.",
-    template: "'deliveries' read {folder} without its declared fields: its 'fields' is not a map of text.",
+    summary: "'deliveries' or 'with-deliveries' read a record whose 'fields' is not a map of text, and gave it no declared fields.",
+    template: "'{verb}' read {folder} without its declared fields: its 'fields' is not a map of text.",
     spec: "docs/adr/0213-a-delivery-record-keeps-the-fields-a-recipe-declares.md",
     fatal: false,
     fatality: "The delivery is still read, with its fixed fields; nothing is written."
@@ -22060,7 +22154,7 @@ function colorValue(context, name, fallback) {
   return typeof value === "string" ? value : fallback;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.51.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -22162,7 +22256,7 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -22216,7 +22310,7 @@ var OPTICAL_DROP = 0.15;
 var UNMEASURED = { body: 22, title: 62 };
 var REFERENCE_SIZE = 100;
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.12.5/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.15.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -22396,7 +22490,7 @@ function trimEnds(field) {
   return trimmed.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
 var PLACEHOLDER_LOGO = {
   box: { w: 186.09, h: 376.79 },
   d: (
@@ -22439,7 +22533,7 @@ function signatureOf(kit) {
   return kit.signature ?? PLACEHOLDER_SIGNATURE;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var NO_BREAK_SPACE = "\xA0";
 function glueParenthesised(text4, before, maxWords = Infinity) {
   return text4.replace(/ (\([^()]*\))/gu, (whole, group3, offset) => {

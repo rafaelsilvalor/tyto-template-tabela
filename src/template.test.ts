@@ -207,23 +207,38 @@ function placed(frame: Frame): Placed[] {
   return result;
 }
 
-/** Each row group's cells: a rect (when filled) and its text, paired by column. */
-function rows(frame: Frame): { name: string; rects: Placed[]; texts: Placed[] }[] {
+/** A cell of a row: its shape when the row is filled, and its words when it has any. */
+interface Cell {
+  readonly rect?: Placed;
+  readonly text?: Placed;
+}
+
+/**
+ * Each row group's cells, in column order. A cell is a group named `cell` holding its rect
+ * and its `cell-text` (the kit's `table` draws it so, house-style 0.8.0, TYTO-878).
+ */
+function rows(frame: Frame): { name: string; cells: Cell[] }[] {
+  const at = (node: SceneNode, parent: Placed): Placed => ({
+    node,
+    x: parent.x + node.transform.x,
+    y: parent.y + node.transform.y,
+    path: [...parent.path, parent.node.name ?? ''],
+  });
   return placed(frame).flatMap((row) => {
     if (row.node.kind !== 'group' || !/-row$/u.test(row.node.name ?? '')) return [];
-    const children = row.node.children.map((node) => ({
-      node,
-      x: row.x + node.transform.x,
-      y: row.y + node.transform.y,
-      path: [...row.path, row.node.name ?? ''],
-    }));
-    return [
-      {
-        name: row.node.name ?? '',
-        rects: children.filter((item) => item.node.name === 'cell'),
-        texts: children.filter((item) => item.node.name === 'cell-text'),
-      },
-    ];
+    const cells = row.node.children
+      .filter((node) => node.kind === 'group' && node.name === 'cell')
+      .map((node) => at(node, row))
+      .map((cell): Cell => {
+        const children = cell.node.kind === 'group' ? cell.node.children : [];
+        const rect = children.find((node) => node.kind === 'rect');
+        const text = children.find((node) => node.name === 'cell-text');
+        return {
+          ...(rect === undefined ? {} : { rect: at(rect, cell) }),
+          ...(text === undefined ? {} : { text: at(text, cell) }),
+        };
+      });
+    return [{ name: row.node.name ?? '', cells }];
   });
 }
 
@@ -271,21 +286,28 @@ describe.each([
 
   it('centres every cell’s words by eye: the drop below the cell’s centre, never outside it', () => {
     const size = bodySize(frame);
+    let checked = 0;
     for (const row of rows(frame)) {
-      for (const [column, item] of row.texts.entries()) {
-        const cell = row.rects[column] ?? row.rects[0];
-        if (cell === undefined || cell.node.kind !== 'rect') continue;
+      for (const { rect: cell, text: item } of row.cells) {
+        if (cell === undefined || item === undefined || cell.node.kind !== 'rect') continue;
         const box = (item.node as TextNode).box;
         const textCentre = item.y + box.h! / 2;
         const cellCentre = cell.y + cell.node.size.h / 2;
         expect(textCentre - cellCentre, row.name).toBeCloseTo(OPTICAL_DROP * size, 6);
+        checked += 1;
       }
     }
+    // The header and every other body row are filled: a reading that found no cell would
+    // check nothing and pass.
+    expect(checked).toBeGreaterThan(10);
   });
 
   it('keeps every cell’s words inside the cell, wrapped to fit its box', () => {
+    let checked = 0;
     for (const row of rows(frame)) {
-      for (const [column, item] of row.texts.entries()) {
+      for (const { rect: cell, text: item } of row.cells) {
+        if (item === undefined) continue;
+        checked += 1;
         const node = item.node as TextNode;
         const box = { w: node.box.w!, h: node.box.h! };
         const measured = proportional(node)!;
@@ -293,7 +315,6 @@ describe.each([
         expect(measured.width, `${row.name} ${textOf(node)}`).toBeLessThanOrEqual(box.w + 0.01);
         expect(measured.height, `${row.name} ${textOf(node)}`).toBeLessThanOrEqual(box.h + 0.01);
 
-        const cell = row.rects[column];
         if (cell !== undefined && cell.node.kind === 'rect') {
           expect(item.x).toBeGreaterThanOrEqual(cell.x);
           expect(item.y).toBeGreaterThanOrEqual(cell.y);
@@ -302,6 +323,7 @@ describe.each([
         }
       }
     }
+    expect(checked).toBeGreaterThan(10);
   });
 
   it('never splits a number or a currency value across lines', () => {
@@ -335,8 +357,9 @@ describe.each([
 describe('the brand', () => {
   it('draws the header in ROXO’s registered accent, the one the mock-exam agenda draws', () => {
     const header = rows(render(FOUR_COLUMNS).frame).find((row) => row.name === 'header-row')!;
-    for (const cell of header.rects) {
-      expect(cell.node.kind === 'rect' && cell.node.fill).toEqual({
+    expect(header.cells).toHaveLength(4);
+    for (const { rect: cell } of header.cells) {
+      expect(cell?.node.kind === 'rect' && cell.node.fill).toEqual({
         kind: 'solid',
         color: { r: 0x59, g: 0x00, b: 0xa6, a: 1 },
       });
@@ -348,7 +371,9 @@ describe('the brand', () => {
 describe('column widths come from the content', () => {
   it('gives the four-column table’s Salário more room than its Vagas', () => {
     const header = rows(render(FOUR_COLUMNS).frame).find((row) => row.name === 'header-row')!;
-    const widths = header.rects.map((item) => (item.node.kind === 'rect' ? item.node.size.w : 0));
+    const widths = header.cells.map(({ rect }) =>
+      rect?.node.kind === 'rect' ? rect.node.size.w : 0,
+    );
 
     expect(widths[3]).toBeGreaterThan(widths[2]!);
   });

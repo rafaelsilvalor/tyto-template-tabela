@@ -1326,9 +1326,9 @@ var Class = class {
   constructor(..._args) {
   }
 };
-function members(proto, table2) {
-  for (const key in table2) {
-    const desc = Object.getOwnPropertyDescriptor(table2, key);
+function members(proto, table3) {
+  for (const key in table3) {
+    const desc = Object.getOwnPropertyDescriptor(table3, key);
     if (desc.get)
       Object.defineProperty(proto, key, { ...desc, enumerable: false });
     else
@@ -1343,10 +1343,10 @@ function hide(inst, key, value) {
   return own(inst, key, value, false);
 }
 // @__NO_SIDE_EFFECTS__
-function derived(computes, table2) {
+function derived(computes, table3) {
   for (const key in computes) {
     const compute = computes[key];
-    Object.defineProperty(table2, key, {
+    Object.defineProperty(table3, key, {
       configurable: true,
       enumerable: true,
       get() {
@@ -1357,7 +1357,7 @@ function derived(computes, table2) {
       }
     });
   }
-  return table2;
+  return table3;
 }
 function defineBound(proto, key, fn) {
   Object.defineProperty(proto, key, {
@@ -5071,17 +5071,17 @@ var recursive = /* @__PURE__ */ new WeakMap();
 var NONE = 0;
 var ASSUMED = 1;
 var PROVEN = 2;
-function isRecursive(inst, stack, resolve) {
+function isRecursive(inst, stack2, resolve) {
   const cached2 = recursive.get(inst);
   if (cached2 !== void 0)
     return cached2 ? PROVEN : NONE;
-  if (stack.has(inst))
+  if (stack2.has(inst))
     return PROVEN;
-  stack.add(inst);
+  stack2.add(inst);
   let result = NONE;
   const check2 = (child) => {
     if (result !== PROVEN && child?._zod) {
-      const answer = isRecursive(child, stack, resolve);
+      const answer = isRecursive(child, stack2, resolve);
       if (answer > result)
         result = answer;
     }
@@ -5092,7 +5092,7 @@ function isRecursive(inst, stack, resolve) {
       const desc = Object.getOwnPropertyDescriptor(sh, key);
       if (spread && !desc.enumerable)
         continue;
-      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve) : NONE;
+      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack2, resolve) : NONE;
       if (child > answer)
         answer = child;
     }
@@ -5157,7 +5157,7 @@ function isRecursive(inst, stack, resolve) {
     // `$ZodLazy` caches its inner on the def, so a resolved edge is followed exactly
     case "lazy": {
       const inner = def._cachedInner ?? (resolve ? inst._zod.innerType : void 0);
-      merge2(inner ? isRecursive(inner, stack, false) : ASSUMED);
+      merge2(inner ? isRecursive(inner, stack2, false) : ASSUMED);
       break;
     }
     // a leaf by choice: `parts` are regex fragments, not data positions
@@ -5200,7 +5200,7 @@ function isRecursive(inst, stack, resolve) {
       }
     }
   }
-  stack.delete(inst);
+  stack2.delete(inst);
   return settle(inst, result);
 }
 function settle(inst, answer) {
@@ -19721,7 +19721,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-IT6P3KDS.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-NUEMZ7BR.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -19784,6 +19784,24 @@ var diagnosticCodes = {
     spec: "docs/brief-language.md",
     fatal: false,
     fatality: "The value of one slot; it stays unset and the rest of the artwork is drawn anyway."
+  },
+  E_BAD_COMUM: {
+    severity: "error",
+    summary: "A `::comum` line, which closes the slides, carries text or adjustments, or is written where there are no slides to close.",
+    template: "'::comum' {problem}.",
+    spec: "docs/brief-language.md",
+    fatal: false,
+    fatality: "One line: what it carries is ignored, and a misplaced one closes nothing while the rest of the brief is read as written."
+  },
+  // An error, not a warning (ADR 0227): an anchor that places nothing would leave the block
+  // off that artwork without a word.
+  E_BAD_BLOCK_NAME: {
+    severity: "error",
+    summary: "A shared block's name, or an empty directive that places one on a slide, does not name a shared block once.",
+    template: "'::{slot}' {problem}.",
+    spec: "docs/adr/0227-shared-and-slide-blocks-add-up-and-a-named-block-is-placed-by-name.md",
+    fatal: false,
+    fatality: "One line: the name or the anchor is ignored, and the shared block is drawn where it was written."
   },
   E_UNKNOWN_SLOT: {
     severity: "error",
@@ -20889,6 +20907,17 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
   },
+  // Raised by a template the same way (TYTO-837): two colours it draws text in, chosen by a
+  // brief or a configuration (ADR 0226), are too close to read well. A warning: the person
+  // chose the colours, and the frame is drawn in them.
+  W_TEMPLATE_LOW_CONTRAST: {
+    severity: "warning",
+    summary: "Two colours an artwork draws text in have too little contrast to read well.",
+    template: "Artwork '{artwork}' in format '{format}': '{foreground}' on '{background}' has a contrast of {ratio}:1, too little for template '{template}' to read well; the colours are kept.",
+    spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
   W_EXTERNAL_ART_MISSING: {
     severity: "warning",
     summary: "A slot whose art is painted outside Tyto has no file yet, and an outlined box stands in for it (ADR 0220).",
@@ -20909,7 +20938,7 @@ var diagnosticCodes = {
   },
   W_TEMPLATE_VALUE_INVALID: {
     severity: "warning",
-    summary: "A configuration sets a declared value to one of the wrong kind or outside its limits.",
+    summary: "A configuration or a brief's frontmatter sets a declared value to one of the wrong kind or outside its limits.",
     template: "Value '{name}' of template '{template}' {problem}; the template's default is used.",
     spec: "docs/adr/0153-a-template-declares-its-configurable-values-in-its-manifest.md",
     fatal: false,
@@ -22154,7 +22183,7 @@ function colorValue(context, name, fallback) {
   return typeof value === "string" ? value : fallback;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -22256,7 +22285,7 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.8.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -22310,7 +22339,7 @@ var OPTICAL_DROP = 0.15;
 var UNMEASURED = { body: 22, title: 62 };
 var REFERENCE_SIZE = 100;
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.15.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.24.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -22330,11 +22359,37 @@ function shifted(draft, dx, dy) {
       return { ...draft, transform: transform2 };
   }
 }
+function offsetFor(align, room, size) {
+  switch (align) {
+    case "start":
+      return 0;
+    case "center":
+      return (room - size) / 2;
+    case "end":
+      return room - size;
+  }
+}
 function block(width, height, draft) {
   return { width, height, draft };
 }
+function stack(options) {
+  const gap = options.gap ?? 0;
+  const align = options.align ?? "start";
+  const width = options.items.reduce((widest, item) => Math.max(widest, item.width), 0);
+  let y = 0;
+  const children = [];
+  for (const item of options.items) {
+    children.push(shifted(item.draft, offsetFor(align, width, item.width), y));
+    y += item.height + gap;
+  }
+  const height = options.items.length === 0 ? 0 : y - gap;
+  return { width, height, draft: groupOf(children, options.name) };
+}
 function at(x, y, item) {
   return shifted(item.draft, x, y);
+}
+function groupOf(children, name) {
+  return group({ children, ...name === void 0 ? {} : { name } });
 }
 var NUMBER = String.raw`\d[\d.,]*`;
 var UNITS = [
@@ -22406,20 +22461,6 @@ function mark(shape, height, fill, name) {
     })
   );
 }
-function sealed(size, seal) {
-  if (seal === void 0) return { size, seal: [] };
-  const band = { w: size.w, h: seal.height };
-  const art = block(
-    band.w,
-    band.h,
-    image({ name: "seal", asset: seal.asset, size: band, fit: "cover" })
-  );
-  return { size: { w: size.w, h: size.h - seal.height }, seal: [at(0, size.h - seal.height, art)] };
-}
-function reportOverflow(report, bottom, limit) {
-  const overflow = bottom - limit;
-  if (overflow > 0) report({ code: "W_TEMPLATE_OVERFLOW", overflow });
-}
 var FIELD_SEPARATOR = "|";
 function lines(text2) {
   const result = [];
@@ -22479,18 +22520,224 @@ function sliceOf(inline, part, whole) {
   };
 }
 function trimEnds(field) {
-  const trimmed = [...field];
-  const first = trimmed[0];
-  if (first?.kind === "text") trimmed[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
-  const lastIndex = trimmed.length - 1;
-  const final = trimmed[lastIndex];
+  const trimmed2 = [...field];
+  const first = trimmed2[0];
+  if (first?.kind === "text") trimmed2[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
+  const lastIndex = trimmed2.length - 1;
+  const final = trimmed2[lastIndex];
   if (final?.kind === "text") {
-    trimmed[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
+    trimmed2[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
   }
-  return trimmed.filter((inline) => inline.kind !== "text" || inline.value !== "");
+  return trimmed2.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
+function sealed(size, seal) {
+  if (seal === void 0) return { size, seal: [] };
+  const band = { w: size.w, h: seal.height };
+  const art = block(
+    band.w,
+    band.h,
+    image({ name: "seal", asset: seal.asset, size: band, fit: "cover" })
+  );
+  return { size: { w: size.w, h: size.h - seal.height }, seal: [at(0, size.h - seal.height, art)] };
+}
+function reportOverflow(report, bottom, limit) {
+  const overflow = bottom - limit;
+  if (overflow > 0) report({ code: "W_TEMPLATE_OVERFLOW", overflow });
+}
+var NO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
+function table(style2, rows, width) {
+  const placed = placeColumns(style2, rows, width);
+  const seen = /* @__PURE__ */ new Map();
+  const drawn = rows.map((row2, index) => {
+    const count = seen.get(row2.kind) ?? 0;
+    seen.set(row2.kind, count + 1);
+    const edges = { first: index === 0, last: index === rows.length - 1 };
+    return row2.span === true ? drawBand(style2, placed, row2, count, edges, width) : drawRow(style2, placed, row2, count, edges, width);
+  });
+  return stack({
+    ...style2.names.table === void 0 ? {} : { name: style2.names.table },
+    gap: style2.rowGap,
+    items: drawn
+  });
+}
+function gapOf(style2) {
+  return (style2.layering ?? "side-by-side") === "side-by-side" ? style2.columnGap ?? 0 : 0;
+}
+function paddingOf(column) {
+  return column.padding ?? NO_PADDING;
+}
+function placeColumns(style2, rows, width) {
+  const gap = gapOf(style2);
+  const widths = style2.columns.map((column, index) => {
+    if (typeof column.width === "number" || column.width === "fill") return column.width;
+    const padding = paddingOf(column);
+    let widest = 0;
+    for (const row2 of rows) {
+      if (row2.span === true) continue;
+      const natural = row2.cells[index]?.naturalWidth?.();
+      if (natural !== void 0) widest = Math.max(widest, natural);
+    }
+    return Math.max(column.width.measured.min, padding.left + widest + padding.right);
+  });
+  const taken = widths.reduce((sum2, each) => sum2 + (each === "fill" ? 0 : each), 0);
+  const fill = width - taken - gap * Math.max(0, style2.columns.length - 1);
+  let x = 0;
+  return style2.columns.map((column, index) => {
+    const own2 = widths[index];
+    const columnWidth = own2 === "fill" ? fill : own2;
+    const result = { column, index, x, width: columnWidth };
+    x += columnWidth + gap;
+    return result;
+  });
+}
+function fillOf(style2, kind, column, count) {
+  const paint = style2.kinds[kind];
+  if (paint === void 0) return void 0;
+  if (paint.zebra !== void 0 && paint.zebra.length > 0) {
+    return paint.zebra[count % paint.zebra.length] ?? void 0;
+  }
+  return typeof paint.fill === "string" ? paint.fill : paint.fill?.[column];
+}
+function cornersOf(style2, column, edges, left, right) {
+  if (column?.radius !== void 0) return column.radius;
+  const corners = style2.corners;
+  if (corners === void 0) return void 0;
+  if (corners.at === "every-cell") return corners.radius;
+  const r = corners.radius;
+  const tuple2 = [
+    edges.first && left ? r : 0,
+    edges.first && right ? r : 0,
+    edges.last && right ? r : 0,
+    edges.last && left ? r : 0
+  ];
+  return tuple2.every((each) => each === 0) ? void 0 : tuple2;
+}
+function drawRow(style2, placed, row2, count, edges, width) {
+  const measured = placed.map((cell) => {
+    const content = row2.cells[cell.index];
+    if (content === void 0) return void 0;
+    const padding = paddingOf(cell.column);
+    return content.draw(cell.width - padding.left - padding.right);
+  });
+  const height = placed.reduce(
+    (tallest, cell, index) => {
+      const content = row2.cells[cell.index];
+      const own2 = measured[index];
+      if (content === void 0 || own2 === void 0 || content.sizesRow === false) {
+        return tallest;
+      }
+      const padding = paddingOf(cell.column);
+      return Math.max(tallest, own2.height + padding.top + padding.bottom);
+    },
+    minHeightOf(style2, row2.kind)
+  );
+  const overlap = style2.layering === "overlap";
+  const drawn = placed.map((cell) => {
+    const padding = paddingOf(cell.column);
+    const inner = {
+      w: cell.width - padding.left - padding.right,
+      h: height - padding.top - padding.bottom
+    };
+    const content = row2.cells[cell.index]?.draw(inner.w, inner.h);
+    const origin = overlap ? 0 : cell.x;
+    const start = overlap ? cell.x : 0;
+    const shapeWidth = overlap ? cell.x + cell.width : cell.width;
+    const fill = fillOf(style2, row2.kind, cell.index, count);
+    const corners = cornersOf(
+      style2,
+      cell.column,
+      edges,
+      cell.index === 0,
+      cell.index === placed.length - 1
+    );
+    return shift(
+      cellGroup(cell.column.name, { w: shapeWidth, h: height }, fill, corners, content, {
+        x: start + padding.left,
+        y: padding.top + offsetOf2(cell.column.valign, inner.h, content)
+      }),
+      origin,
+      0
+    );
+  });
+  return block(
+    width,
+    height,
+    group({
+      name: rowNameOf(style2, row2.kind),
+      // Painted in order, so under `overlap` the earlier cells go last and cover the
+      // rounded left ends of the later ones.
+      children: overlap ? drawn.reverse() : drawn
+    })
+  );
+}
+function drawBand(style2, placed, row2, count, edges, width) {
+  const first = placed[0]?.column;
+  const last = placed[placed.length - 1]?.column;
+  const padding = {
+    top: first === void 0 ? 0 : paddingOf(first).top,
+    bottom: first === void 0 ? 0 : paddingOf(first).bottom,
+    left: first === void 0 ? 0 : paddingOf(first).left,
+    right: last === void 0 ? 0 : paddingOf(last).right
+  };
+  const innerWidth = width - padding.left - padding.right;
+  const content = row2.cells[0];
+  const measured = content?.draw(innerWidth);
+  const height = Math.max(
+    minHeightOf(style2, row2.kind),
+    measured === void 0 || content?.sizesRow === false ? 0 : measured.height + padding.top + padding.bottom
+  );
+  const innerHeight = height - padding.top - padding.bottom;
+  const drawn = content?.draw(innerWidth, innerHeight);
+  const corners = cornersOf(style2, void 0, edges, true, true);
+  return block(
+    width,
+    height,
+    group({
+      name: rowNameOf(style2, row2.kind),
+      children: [
+        cellGroup(
+          style2.names.band ?? "band",
+          { w: width, h: height },
+          fillOf(style2, row2.kind, 0, count),
+          corners,
+          drawn,
+          { x: padding.left, y: padding.top + offsetOf2(first?.valign, innerHeight, drawn) }
+        )
+      ]
+    })
+  );
+}
+function rowNameOf(style2, kind) {
+  return style2.kinds[kind]?.name ?? style2.names.row;
+}
+function minHeightOf(style2, kind) {
+  return style2.kinds[kind]?.minHeight ?? style2.minRowHeight;
+}
+function offsetOf2(valign, room, content) {
+  if (content === void 0) return 0;
+  const spare = room - content.height;
+  if (spare <= 0) return 0;
+  const where = valign ?? "middle";
+  if (where === "top") return 0;
+  return where === "bottom" ? spare : spare / 2;
+}
+function cellGroup(name, size, fill, corners, content, place) {
+  const children = [];
+  if (fill !== void 0) {
+    children.push(
+      rect({ size, ...corners === void 0 ? {} : { radius: corners }, fill: solid(fill) })
+    );
+  }
+  if (content !== void 0) children.push(shift(content.draft, place.x, place.y));
+  return group({ name, children });
+}
+function shift(draft, dx, dy) {
+  if (dx === 0 && dy === 0) return draft;
+  return at(dx, dy, block(0, 0, draft));
+}
+var NO_FILL = solid({ r: 0, g: 0, b: 0, a: 0 });
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.8.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-KTMH3XT2.js
 var PLACEHOLDER_LOGO = {
   box: { w: 186.09, h: 376.79 },
   d: (
@@ -22533,7 +22780,7 @@ function signatureOf(kit) {
   return kit.signature ?? PLACEHOLDER_SIGNATURE;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.8.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var NO_BREAK_SPACE = "\xA0";
 function glueParenthesised(text4, before, maxWords = Infinity) {
   return text4.replace(/ (\([^()]*\))/gu, (whole, group3, offset) => {
@@ -22653,14 +22900,14 @@ function oneImageTable(own2) {
     const regionBottom = context.size.h - PAGE.bottom - SIGNATURE.height;
     const room = regionBottom - regionTop;
     const look = lookOf(context);
-    const table2 = readTable(richTextOf3(context, "tabela") ?? []);
+    const table3 = readTable(richTextOf3(context, "tabela") ?? []);
     const title = titleLines(richTextOf3(context, "titulo") ?? []);
-    const glued = gluedCells(table2);
-    const plan = fit(table2, glued, title, width, room, context.measure, look);
+    const glued = gluedCells(table3);
+    const plan = fit(table3, glued, title, width, room, context.measure, look);
     reportOverflow(context.report, plan.height, room);
     const titleBlock = drawTitle(title, plan, width, brand.accent);
-    const tableBlock = drawTable(table2, glued, plan, brand.accent, look);
-    const notesBlock = drawNotes(table2.notes, plan, width, look);
+    const tableBlock = drawTable(table3, glued, plan, brand.accent, look);
+    const notesBlock = drawNotes(table3.notes, plan, width, look);
     const tableY = regionTop + titleBlock.height + look.titleGap;
     return frame({
       format: context.format,
@@ -22755,10 +23002,10 @@ function cellText2(words, role, size, look) {
     letterSpacing: style2.tracking * size
   };
 }
-function gluedCells(table2) {
+function gluedCells(table3) {
   return {
-    header: table2.header.map(glue),
-    rows: table2.rows.map((row) => row.kind === "cells" ? row.cells.map(glue) : [glue(row.text)])
+    header: table3.header.map(glue),
+    rows: table3.rows.map((row) => row.kind === "cells" ? row.cells.map(glue) : [glue(row.text)])
   };
 }
 function titleLines(titulo) {
@@ -22766,18 +23013,18 @@ function titleLines(titulo) {
     (line) => plain(line).replace(/\s+/gu, " ").trim().toLocaleUpperCase("pt-BR")
   );
 }
-function fit(table2, glued, title, width, room, measure, look) {
-  const columns = table2.header.length;
+function fit(table3, glued, title, width, room, measure, look) {
+  const columns = table3.header.length;
   const across = width - CELL.gapX * Math.max(0, columns - 1);
-  const demand = columnDemand(table2, glued, measure, look);
-  if (demand === void 0) return unmeasuredPlan(table2, title, width, look);
+  const demand = columnDemand(table3, glued, measure, look);
+  if (demand === void 0) return unmeasuredPlan(table3, title, width, look);
   const planAt = (size) => {
     const widths = columnWidths(demand, size, across);
     if (widths === void 0) return void 0;
-    const heights = rowHeights(table2, glued, widths, size, measure, look);
+    const heights = rowHeights(table3, glued, widths, size, measure, look);
     const titleSize = titleSizeFor(title, size, width, measure, look);
     const titleHeight = titleHeightAt(title, titleSize, width, measure, look);
-    const notes = notesAt(table2.notes, size, width, measure, look);
+    const notes = notesAt(table3.notes, size, width, measure, look);
     const tableHeight = sum(heights) + CELL.gapY * Math.max(0, heights.length - 1);
     return {
       size,
@@ -22804,12 +23051,12 @@ function fit(table2, glued, title, width, room, measure, look) {
     }
   }
   if (best !== void 0) return best;
-  return planAt(look.bodyFloor) ?? floorPlan(table2, glued, demand, title, width, across, measure, look);
+  return planAt(look.bodyFloor) ?? floorPlan(table3, glued, demand, title, width, across, measure, look);
 }
-function columnDemand(table2, glued, measure, look) {
-  const min = table2.header.map(() => 0);
-  const natural = table2.header.map(() => 0);
-  const cells = table2.header.map(() => []);
+function columnDemand(table3, glued, measure, look) {
+  const min = table3.header.map(() => 0);
+  const natural = table3.header.map(() => 0);
+  const cells = table3.header.map(() => []);
   const take = (words, role, column, row) => {
     const cellLines = [];
     for (const line of words.split("\n")) {
@@ -22831,7 +23078,7 @@ function columnDemand(table2, glued, measure, look) {
   for (const [column, words] of glued.header.entries()) {
     if (!take(words, "header", column, 0)) return void 0;
   }
-  for (const [index, row] of table2.rows.entries()) {
+  for (const [index, row] of table3.rows.entries()) {
     if (row.kind !== "cells") continue;
     for (const [column, words] of glued.rows[index].entries()) {
       if (!take(words, "cell", column, index + 1)) return void 0;
@@ -22956,7 +23203,7 @@ function shortestTable(demand, start, leftover, size, toPx) {
   }
   return widths;
 }
-function rowHeights(table2, glued, widths, size, measure, look) {
+function rowHeights(table3, glued, widths, size, measure, look) {
   const whole = sum(widths) + CELL.gapX * Math.max(0, widths.length - 1);
   const rowOf = (cells, role, spans) => {
     const style2 = roleStyle(role, look);
@@ -22971,7 +23218,7 @@ function rowHeights(table2, glued, widths, size, measure, look) {
   };
   return [
     rowOf(glued.header, "header", widths),
-    ...table2.rows.map(
+    ...table3.rows.map(
       (row, index) => row.kind === "cells" ? rowOf(glued.rows[index], "cell", widths) : rowOf(glued.rows[index], "band", [whole])
     )
   ];
@@ -23005,8 +23252,8 @@ function titleHeightAt(title, size, width, measure, look) {
   const measured = measureTitle(title, size, width, measure, look);
   return measured?.height ?? titleLineLimit(title) * TITLE.lineHeight * size;
 }
-function unmeasuredPlan(table2, title, width, look) {
-  const columns = Math.max(1, table2.header.length);
+function unmeasuredPlan(table3, title, width, look) {
+  const columns = Math.max(1, table3.header.length);
   const size = UNMEASURED.body;
   const column = (width - CELL.gapX * (columns - 1)) / columns;
   const line = (role) => {
@@ -23015,35 +23262,35 @@ function unmeasuredPlan(table2, title, width, look) {
   };
   const heights = [
     line("header"),
-    ...table2.rows.map((row) => line(row.kind === "cells" ? "cell" : "band"))
+    ...table3.rows.map((row) => line(row.kind === "cells" ? "cell" : "band"))
   ];
   const titleHeight = title.length === 0 ? 0 : title.length * TITLE.lineHeight * UNMEASURED.title;
   const noteSize = noteSizeFor(size);
-  const notes = table2.notes.length === 0 ? { noteSize, notesHeight: 0, notesGap: 0 } : {
+  const notes = table3.notes.length === 0 ? { noteSize, notesHeight: 0, notesGap: 0 } : {
     noteSize,
-    notesHeight: table2.notes.length * NOTE.lineHeight * noteSize,
+    notesHeight: table3.notes.length * NOTE.lineHeight * noteSize,
     notesGap: NOTE.gap * size
   };
   return {
     size,
     title: UNMEASURED.title,
     titleHeight,
-    widths: table2.header.map(() => column),
+    widths: table3.header.map(() => column),
     heights,
     ...notes,
     height: titleHeight + look.titleGap + sum(heights) + CELL.gapY * Math.max(0, heights.length - 1) + notes.notesGap + notes.notesHeight,
     unmeasured: true
   };
 }
-function floorPlan(table2, glued, demand, title, width, room, measure, look) {
+function floorPlan(table3, glued, demand, title, width, room, measure, look) {
   const size = look.bodyFloor;
   const total = sum(demand.min);
   const widths = demand.min.map(
     (value) => total === 0 ? room / demand.min.length : room * value / total
   );
-  const heights = rowHeights(table2, glued, widths, size, measure, look);
+  const heights = rowHeights(table3, glued, widths, size, measure, look);
   const titleHeight = titleHeightAt(title, look.titleFloor, width, measure, look);
-  const notes = notesAt(table2.notes, size, width, measure, look);
+  const notes = notesAt(table3.notes, size, width, measure, look);
   return {
     size,
     title: look.titleFloor,
@@ -23119,68 +23366,59 @@ function drawTitle(title, plan, width, accent) {
     group({ children: [at(TITLE.inset, 0, block(inner, plan.titleHeight, node2))] })
   );
 }
-function drawTable(table2, glued, plan, accent, look) {
+function drawTable(table3, glued, plan, accent, look) {
   const whole = sum(plan.widths) + CELL.gapX * Math.max(0, plan.widths.length - 1);
-  const children = [];
-  let y = 0;
-  let striped = 0;
-  const drawRow = (name, cells, role, spans, fill, height2) => {
-    const style2 = roleStyle(role, look);
-    const cellNodes = [];
-    let x = 0;
-    for (const [column, words] of cells.entries()) {
-      const span = spans[column];
-      if (fill !== void 0) {
-        cellNodes.push(
-          rect({
-            name: "cell",
-            size: { w: span, h: height2 },
-            radius: CELL.radius,
-            fill: solid(fill),
-            transform: { x, y }
-          })
-        );
-      }
-      if (words !== "") {
-        const padX = style2.inline * plan.size;
-        const trim = 2 * look.opticalDrop * plan.size;
-        cellNodes.push(
-          text({
-            ...cellText2(words, role, plan.size, look),
-            name: "cell-text",
-            box: { w: span - 2 * padX, h: height2 - trim },
-            align: "center",
-            valign: "middle",
-            ...plan.unmeasured ? { overflow: "shrink" } : {},
-            transform: { x: x + padX, y: y + trim }
-          })
-        );
-      }
-      x += span + CELL.gapX;
-    }
-    children.push(group({ name, children: cellNodes }));
+  const style2 = {
+    columns: plan.widths.map((width) => ({ name: "cell", width })),
+    kinds: {
+      header: { name: "header-row", fill: accent },
+      // The first body row is striped, as in the approved art; a band does not count.
+      body: { name: "body-row", zebra: [look.zebra, null] },
+      band: { name: "band-row", fill: accent }
+    },
+    columnGap: CELL.gapX,
+    rowGap: CELL.gapY,
+    minRowHeight: 0,
+    corners: { radius: CELL.radius, at: "every-cell" },
+    names: { table: "table", row: "body-row", band: "cell" }
   };
-  drawRow("header-row", glued.header, "header", plan.widths, accent, plan.heights[0]);
-  y += plan.heights[0] + CELL.gapY;
-  for (const [index, row] of table2.rows.entries()) {
-    const height2 = plan.heights[index + 1];
-    if (row.kind === "band") {
-      drawRow("band-row", glued.rows[index], "band", [whole], accent, height2);
-    } else {
-      drawRow(
-        "body-row",
-        glued.rows[index],
-        "cell",
-        plan.widths,
-        striped % 2 === 0 ? look.zebra : void 0,
-        height2
-      );
-      striped += 1;
+  const row = (kind, cells, role, height) => {
+    const drawn = cells.map(
+      (words) => cellBlock(words, role, height, plan, look)
+    );
+    if (cells.length > 0 && !drawn.some((cell) => cell !== void 0)) {
+      drawn[0] = { draw: (width) => block(width, height, group({ children: [] })) };
     }
-    y += height2 + CELL.gapY;
+    return { kind, cells: drawn, ...kind === "band" ? { span: true } : {} };
+  };
+  const rows = [row("header", glued.header, "header", plan.heights[0])];
+  for (const [index, each] of table3.rows.entries()) {
+    const height = plan.heights[index + 1];
+    rows.push(
+      each.kind === "band" ? row("band", glued.rows[index], "band", height) : row("body", glued.rows[index], "cell", height)
+    );
   }
-  const height = Math.max(0, y - CELL.gapY);
-  return block(whole, height, group({ name: "table", children }));
+  return table(style2, rows, whole);
+}
+function cellBlock(words, role, height, plan, look) {
+  if (words === "") return void 0;
+  const style2 = roleStyle(role, look);
+  return {
+    draw: (span) => {
+      const padX = style2.inline * plan.size;
+      const trim = 2 * look.opticalDrop * plan.size;
+      const node2 = text({
+        ...cellText2(words, role, plan.size, look),
+        name: "cell-text",
+        box: { w: span - 2 * padX, h: height - trim },
+        align: "center",
+        valign: "middle",
+        ...plan.unmeasured ? { overflow: "shrink" } : {},
+        transform: { x: padX, y: trim }
+      });
+      return block(span, height, node2);
+    }
+  };
 }
 function drawSignature(kit, width, look) {
   const words = text({
@@ -23209,12 +23447,12 @@ function richTextOf3(context, name) {
 }
 
 // src/template.ts
-var table = oneImageTable(ROXO_TABLE);
+var table2 = oneImageTable(ROXO_TABLE);
 var build = (context) => {
   const seal = sealOf(context);
-  if (seal === void 0) return table(context);
+  if (seal === void 0) return table2(context);
   const page = sealed(context.size, seal);
-  const above = table({ ...context, size: page.size });
+  const above = table2({ ...context, size: page.size });
   return frame({
     format: context.format,
     size: context.size,
